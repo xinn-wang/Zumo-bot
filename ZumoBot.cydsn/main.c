@@ -28,6 +28,9 @@
     I2C, UART, Serial<br>
     </p>
 */
+  
+#include "xin.h"
+
 
 #include <project.h>
 #include <stdio.h>
