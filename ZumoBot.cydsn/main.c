@@ -28,8 +28,12 @@
     I2C, UART, Serial<br>
     </p>
 */
+<<<<<<< HEAD
   
 #include "xin.h"
+=======
+    #include "subash.h"
+>>>>>>> 4cc98c298e29da1234e3bfe06a06ea6ec112fd29
 
 
 #include <project.h>
