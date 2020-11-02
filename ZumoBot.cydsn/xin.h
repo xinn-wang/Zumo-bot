@@ -9,6 +9,7 @@
  *
  * ========================================
 */
+
 #include <project.h>
 #include <stdio.h>
 #include "FreeRTOS.h"
@@ -27,4 +28,5 @@
 #include <sys/time.h>
 #include "serial1.h"
 #include <unistd.h>
+
 /* [] END OF FILE */
