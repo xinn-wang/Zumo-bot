@@ -40,19 +40,32 @@ void w3_a1(void)
 
 void w3_a2(void)
 {
-
+    printf("Robot starts!");
     Ultra_Start();                          // Ultra Sonic Start function
     motor_start();      
     motor_forward(0,0);
-    vTaskDelay(1500);
     
-    motor_forward(167,2000);
-    motor_turn(26,0,2010);
     
+    BatteryLed_Write(1);
+    while (SW1_Read()==1);
+    printf("Light off");
+    BatteryLed_Write(0);
+    vTaskDelay(1000);
+    
+    
+    
+    while (SW1_Read()==1){
         int d = Ultra_GetDistance();
-        printf("distance = %d\r\n", d);
-        vTaskDelay(200);
+        while (d < 10){
+            motor_backward(100,800);
+            motor_turn(0,200,350);
+        }
+        
+        motor_forward(200,10);
     }
+    motor_forward(0,0);
+    motor_stop();
+}
 
 void w4_a1(void)
 {

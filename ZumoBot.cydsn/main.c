@@ -44,8 +44,16 @@
 // Hello World!
 void zmain(void)
 {
+<<<<<<< HEAD
     printf("\nHello, World!\n");
     make4_1();
+=======
+
+
+
+    printf("\nHello, World!\n");
+    w3_a2();
+>>>>>>> 4c1494243f0c518f899bf4d590556fa2fbf77da5
 
     while(true)
     {
