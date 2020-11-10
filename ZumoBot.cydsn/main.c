@@ -44,12 +44,8 @@
 // Hello World!
 void zmain(void)
 {
-
-
-    test();
-
     printf("\nHello, World!\n");
-    w3_a1();
+    make4_1();
 
     while(true)
     {
