@@ -45,10 +45,9 @@
 void zmain(void)
 {
 
-    test();
 
     printf("\nHello, World!\n");
-    w3_a1();
+    w3_a2();
     while(true)
     {
         vTaskDelay(100); // sleep (in an infinite loop)
