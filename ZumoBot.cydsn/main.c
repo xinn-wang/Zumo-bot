@@ -44,11 +44,8 @@
 // Hello World!
 void zmain(void)
 {
-
-
-
+    w3_a3();
     printf("\nHello, World!\n");
-    w3_a2();
 
     while(true)
     {
