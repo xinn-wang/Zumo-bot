@@ -29,7 +29,7 @@
 #include "serial1.h"
 #include <unistd.h>
 
-void test(void);
-
+void W3A1(void);
+void W3A2(void);
 /* [] END OF FILE */
 
