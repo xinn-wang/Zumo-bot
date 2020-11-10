@@ -28,5 +28,10 @@
 #include <sys/time.h>
 #include "serial1.h"
 #include <unistd.h>
+void w3_a1(void);
+void w3_a2(void);
+
+void w4_a1(void);
+
 
 /* [] END OF FILE */

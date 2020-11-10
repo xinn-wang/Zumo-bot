@@ -33,6 +33,7 @@
 #include "subash.h"
 #include "miguel.h"
 
+
 /**
  * @file    main.c
  * @brief   
@@ -43,7 +44,15 @@
 // Hello World!
 void zmain(void)
 {
+
     test();
+
+    printf("\nHello, World!\n");
+    w3_a1();
+    while(true)
+    {
+        vTaskDelay(100); // sleep (in an infinite loop)
+    }
  }   
 #endif
 
