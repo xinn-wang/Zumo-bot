@@ -38,23 +38,43 @@ void W3A1(void){
 
 void W3A2(void){
     
+    printf("\nMoving robot!\n");
     Ultra_Start();                          // Ultra Sonic Start function
     motor_start();      
     motor_forward(0,0);
-    vTaskDelay(1500);
     
-    motor_forward(167,2000);
-    motor_turn(26,0,2010);
     
+    BatteryLed_Write(1);
+    while (SW1_Read()==1);
+    printf("\nLight off\n");
+    BatteryLed_Write(0);
+    vTaskDelay(1000);
+    
+    
+    
+    while (SW1_Read()==1){
         int d = Ultra_GetDistance();
-        printf("distance = %d\r\n", d);
-        vTaskDelay(200);
+        if (d < 10){
+            motor_backward(100,800);
+            motor_turn(240,0,350);
+        }
+        
+        motor_forward(200,10);
+    }
+    
+    motor_stop();
 
 
 
 
 
 
+
+}
+
+void W3A3 (void){
+    
+    
 }
 
 
