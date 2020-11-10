@@ -30,6 +30,6 @@
 #include <unistd.h>
 
 
-
+void make4_1(void);
 
 /* [] END OF FILE */
