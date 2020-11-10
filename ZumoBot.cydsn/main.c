@@ -43,12 +43,7 @@
 // Hello World!
 void zmain(void)
 {
-    printf("\nHello, World!\n");
-
-    while(true)
-    {
-        vTaskDelay(100); // sleep (in an infinite loop)
-    }
+    test();
  }   
 #endif
 

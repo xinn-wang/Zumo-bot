@@ -29,5 +29,7 @@
 #include "serial1.h"
 #include <unistd.h>
 
+void test(void);
+
 /* [] END OF FILE */
 
