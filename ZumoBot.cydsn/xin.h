@@ -28,10 +28,14 @@
 #include <sys/time.h>
 #include "serial1.h"
 #include <unistd.h>
+#include <stdlib.h>
 void w3_a1(void);
 void w3_a2(void);
-
+void w3_a3(void);
 void w4_a1(void);
+void w4_a2(void);
+void w4_a3(void);
+void tank_turn(int16 angle);
 
 
 /* [] END OF FILE */
