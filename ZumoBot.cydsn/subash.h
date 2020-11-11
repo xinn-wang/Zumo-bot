@@ -28,8 +28,12 @@
 #include <sys/time.h>
 #include "serial1.h"
 #include <unistd.h>
+#include <stdlib.h>
 
 void W3A1(void);
 void W3A2(void);
+void W3A3(void);
+void W4A1(void);
+void tank_turn(int16 angle);
 /* [] END OF FILE */
 
