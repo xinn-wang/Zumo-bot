@@ -45,6 +45,7 @@
 void zmain(void)
 {
 
+
     w3_a3();
 
     printf("\nHello, World!\n");
@@ -52,6 +53,14 @@ void zmain(void)
     while(true)
     {
         vTaskDelay(100); // sleep (in an infinite loop)
+
+     //lineFollowing();
+    //Distancesensor();
+    randomTurn();
+    
+    while(true){
+        vTaskDelay(100);
+
     }
  }   
 #endif
