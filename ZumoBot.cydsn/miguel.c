@@ -138,7 +138,7 @@ void make4_2(void)
         if ((dig.L3 == 1)&&(dig.R3 == 1)) {
             count++;
             if (count == 1) {
-               
+               IR_Start();
             }
             while (dig.L3== 1 && dig.R3 == 1){
                 reflectance_digital(&dig);

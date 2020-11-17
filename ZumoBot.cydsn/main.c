@@ -46,8 +46,7 @@ void zmain(void)
 {
 
 
-    w4_a1();
-
+    w4_a2();
 
     printf("\nHello, World!\n");
  
