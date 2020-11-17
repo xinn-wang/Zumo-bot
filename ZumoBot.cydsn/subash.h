@@ -30,12 +30,11 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-void tanketurn(int16 angle);
-void pushButton(void);
-
 void lineFollowing(void);
 void Distancesensor(void);
 void randomTurn(void);
+void Reflectorsensors(void);
+void tanketurn(int16 angle);
 
 /* [] END OF FILE */
 
