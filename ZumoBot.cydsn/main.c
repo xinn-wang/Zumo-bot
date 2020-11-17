@@ -46,7 +46,8 @@ void zmain(void)
 {
      //lineFollowing();
     //Distancesensor();
-    randomTurn();
+    //randomTurn();
+     Reflectorsensors();
     
     while(true){
         vTaskDelay(100);
