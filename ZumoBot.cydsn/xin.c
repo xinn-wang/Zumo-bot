@@ -174,17 +174,18 @@ void w4_a2(void){
         while(dig.L1 == 1 && dig.R1 == 1){
         motor_forward(70,0);
         
-        while(dig.L1 == 0){
+        if(dig.L1 == 0){
             motor_turn(50,0,50);
         }
      
-        while(dig.R1 == 0){
+        if(dig.R1 == 0){
             motor_turn(0,50,50);
         }
  
-        while(dig.L3 == 1 && dig.L2 == 1 &&dig.L1 == 1 &&dig.R1 == 1 &&dig.R2 == 1 &&dig.R3 == 1){
+        if(dig.L3 == 1 && dig.L2 == 1 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 1 && dig.R3 == 1){
             count++;
         }
+        
         }
     }
     while(count == 2) {
