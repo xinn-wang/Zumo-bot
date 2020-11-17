@@ -44,13 +44,24 @@
 // Hello World!
 void zmain(void)
 {
+
      //lineFollowing();
     //Distancesensor();
     //randomTurn();
      Reflectorsensors();
     
+
+
+
+    w4_a2();
+
+
+    printf("\nHello, World!\n");
+ 
+
     while(true){
         vTaskDelay(100);
+
     }
  }   
 #endif

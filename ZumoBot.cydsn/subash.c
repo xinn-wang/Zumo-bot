@@ -150,7 +150,7 @@ void Reflectorsensors(void){
     }
 
 }
-
+    
 void tanketurn(int16 angle){
      uint8 left_wheel = 0,right_wheel =0;
     if (angle < 0 ){
@@ -166,7 +166,6 @@ void tanketurn(int16 angle){
     
     SetMotors(left_wheel,right_wheel, 200, 200, delay);
 }
-
 
 
 
