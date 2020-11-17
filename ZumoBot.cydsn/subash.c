@@ -123,23 +123,6 @@ void W4A1 (void) {
 
 
 
-void tank_turn(int16 angle){
-     uint8 left_wheel = 0,right_wheel =0;
-    if (angle < 0 ){
-        left_wheel = 0;
-        right_wheel = 1;
-    }
-    else if(angle >= 0){
-        left_wheel =1;
-        right_wheel = 0;
-    }
-    uint16 correct_angle = (angle<0)? angle* -1:angle;
-    uint32 delay =correct_angle % 360 *524 / 360;
-    
-    SetMotors(left_wheel,right_wheel, 200, 200, delay);
-}
-
-
 
 
 /* [] END OF FILE */
