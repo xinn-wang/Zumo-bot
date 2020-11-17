@@ -30,10 +30,12 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-void W3A1(void);
-void W3A2(void);
-void W3A3(void);
-void W4A1(void);
-void tank_turn(int16 angle);
+void tanketurn(int16 angle);
+void pushButton(void);
+
+void lineFollowing(void);
+void Distancesensor(void);
+void randomTurn(void);
+
 /* [] END OF FILE */
 

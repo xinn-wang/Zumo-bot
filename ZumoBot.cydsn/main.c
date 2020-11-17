@@ -45,13 +45,15 @@
 void zmain(void)
 {
 
+
     w4_a2();
 
-    printf("\nHello, World!\n");
 
-    while(true)
-    {
-        vTaskDelay(100); // sleep (in an infinite loop)
+    printf("\nHello, World!\n");
+ 
+    while(true){
+        vTaskDelay(100);
+
     }
  }   
 #endif

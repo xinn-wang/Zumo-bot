@@ -9,7 +9,7 @@
  *
  * ========================================
 */
-
+#include <xin.h>
 #include <miguel.h>
 #define STOP 5
 
@@ -110,5 +110,61 @@ void make4_1(void)  // this function makes zumoBot count 5 lines from the start 
     }
 
 }
+void make4_2(void)
+{
+    printf("Place the robort at the start line\n");
+    struct sensors_ dig;
+    reflectance_set_threshold(9000, 9000, 11000, 11000, 9000, 9000);
+    
+    reflectance_start();
+    IR_Start();
+    motor_start();
+    motor_forward(0,0);
+    
+    BatteryLed_Write(1);
+    while (SW1_Read()==1);
+    printf("Here we go");
+    BatteryLed_Write(0);
+    vTaskDelay(1000);
+    
+    int count = 0;
+    
+    
+    reflectance_digital(&dig);
+    motor_forward(60,0);
+    
+    while(count < 2) {
+        reflectance_digital(&dig);
+        if ((dig.L3 == 1)&&(dig.R3 == 1)) {
+            count++;
+            if (count == 1) {
+               
+            }
+            while (dig.L3== 1 && dig.R3 == 1){
+                reflectance_digital(&dig);
+            }
+        }
+        
+        if(dig. L1 == 0){
+            motor_turn(50,0,0);
+        }
+        if(dig.R1 == 0){
+            motor_turn(0,50,0);
+        }
+        if((dig.L1 == 1)&&(dig.R1 == 1))
+           motor_forward(50,0);
+       
+    }
+  
+    motor_forward(0,0);
+    motor_stop();
+    while(true) {
+        vTaskDelay(100);
+    }
+
+}
+
+
+
 
 
