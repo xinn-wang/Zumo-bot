@@ -31,5 +31,6 @@
 
 
 void make4_1(void);
+void make4_2(void);
 
 /* [] END OF FILE */

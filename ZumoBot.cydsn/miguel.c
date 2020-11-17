@@ -138,21 +138,22 @@ void make4_2(void)
         if ((dig.L3 == 1)&&(dig.R3 == 1)) {
             count++;
             if (count == 1) {
-               IR_Start();
+               
             }
             while (dig.L3== 1 && dig.R3 == 1){
                 reflectance_digital(&dig);
+                motor_forward(60,10);
             }
         }
         
-        if(dig. L1 == 0){
-            motor_turn(50,0,0);
+        if(dig. L2 == 0){
+            motor_turn(60,0,10);
         }
-        if(dig.R1 == 0){
-            motor_turn(0,50,0);
+        if(dig.R2 == 0){
+            motor_turn(0,60,10);
         }
         if((dig.L1 == 1)&&(dig.R1 == 1))
-           motor_forward(50,0);
+           motor_forward(60,0);
        
     }
   
