@@ -166,40 +166,33 @@ void w4_a2(void){
     BatteryLed_Write(0);
     vTaskDelay(1000);
     
-    int angle=0;
-    
-    IR_wait();
+    int count = 0;
     reflectance_digital(&dig);
-    
-    
-    while (dig.L1 == 1 && dig.R1 == 1){
-        motor_forward(70,0);
+    IR_wait();
+    while(count < 2){
         reflectance_digital(&dig);
-        if(dig.L2 == 1 && dig.R2 == 0){ 
-            angle += 2;
-            tank_turn(angle);
-
+        while(dig.L1 == 1 && dig.R1 == 1){
+        motor_forward(70,0);
         }
-        if(dig.L2 == 0 && dig.R2 == 1){
-            angle -= 2;
-            tank_turn(angle);
-            
+        
+        while(dig.L1 == 0){
+            motor_turn(50,0,50);
         }
-        if(dig.L1 == 0){
-            angle -= 1;
-            tank_turn(angle);
-            
+     
+        while(dig.R1 == 0){
+            motor_turn(0,50,50);
         }
-        if(dig.R1 == 0){
-            angle += 1;
-            tank_turn(angle);
-           
+ 
+        while(dig.L3 == 1 && dig.L2 == 1 &&dig.L1 == 1 &&dig.R1 == 1 &&dig.R2 == 1 &&dig.R3 == 1){
+            count++;
         }
-       
     }
-  
+    while(count == 2) {
+        motor_forward(0,0);
+    }
     
     motor_stop();
+    printf("\nHappy Birthday!");
 
 }
 
