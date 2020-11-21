@@ -73,7 +73,7 @@ void w3_a2(void){
 
 void w3_a3(void){
     printf("Robot starts!");
-    Ultra_Start();                          // Ultra Sonic Start function
+    Ultra_Start();                          
     motor_start();      
     motor_forward(0,0);
     
@@ -262,6 +262,113 @@ void w4_a3(void){
     printf("\nHappy Birthday!");
 }
 
+void w5_a1(void){
+    send_mqtt("Zumo101/turn","Time recording");
+    
+    TickType_t time0;
+    TickType_t time1;
+    
+    Ultra_Start();                         
+    motor_start();      
+    motor_forward(0,0);
+    
+    BatteryLed_Write(1);
+    while (SW1_Read()==1);
+    printf("Light off");
+    BatteryLed_Write(0);
+    vTaskDelay(1000);
+    time0 = xTaskGetTickCount();
+    
+    while(true){
+        while (SW1_Read() == 1);
+        time1 = xTaskGetTickCount();
+        int t = time1 - time0;
+        print_mqtt("Zumo101/button", "since last button push: %d s.\n", t/1000);
+        while (SW1_Read() ==0);
+        time0 = time1;
+    }
+}
+    
+
+
+void w5_a2(void){
+    send_mqtt("Zumo101/turn","Turning");
+    Ultra_Start();                         
+    motor_start();      
+    motor_forward(0,0);
+    
+    BatteryLed_Write(1);
+    while (SW1_Read()==1);
+    printf("Light off");
+    BatteryLed_Write(0);
+    vTaskDelay(1000);
+    
+    while (SW1_Read()==1){
+        
+        int d = Ultra_GetDistance();
+        if (d < 10){
+            motor_backward(100,800);
+            int t = rand()%2;
+            if(t == 1){
+            tank_turn(90);
+            print_mqtt("Zumo101/turn","Turn left 90 degrees");
+            }
+            else if (t == 0){
+            tank_turn(-90);
+            print_mqtt("Zumo101/turn","Turn right 90 degrees");
+            }
+        }
+
+        motor_forward(200,50);
+    }
+    motor_stop();
+}
+void w5_a3(void){
+    send_mqtt("Zumo101/lap","Count time");
+    struct sensors_ dig;
+    reflectance_set_threshold(15000, 15000, 18000, 18000, 15000, 15000);
+    
+    reflectance_start();
+    IR_Start();
+    
+    motor_start();
+    motor_forward(0,0);
+    
+    BatteryLed_Write(1);
+    while (SW1_Read()==1);
+    print_mqtt("Zumo101/lap","Move starts");
+    BatteryLed_Write(0);
+    vTaskDelay(1000);
+    
+    int count = 0;
+    int touching = 0;
+    TickType_t time;
+    
+    while(count < 2){
+        reflectance_digital(&dig);
+        
+        if (touching == 0 && dig.L3 == 1 && dig.L2 == 1 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 1 && dig.R3 == 1) {
+            count++;
+            touching = 1;
+            if (count == 1) {
+                motor_forward(0, 0);
+                print_mqtt("Zumo101/lap","Waiting to IR signal");
+                IR_wait();
+                time = xTaskGetTickCount();
+                print_mqtt("Zumo101/lap","Time counting starts");
+            }
+        }
+        if (touching == 1 && dig.L3 == 0 && dig.L2 == 0 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 0 && dig.R3 == 0) {
+            touching = 0;
+        }
+        
+        motor_forward(100, 0);
+        
+    }
+    motor_stop();
+    print_mqtt("Zumo101/lap","Time costs %d s", time/1000);
+
+}
 
 void tank_turn(int16 angle){
      uint8 left_wheel = 0,right_wheel =0;
@@ -278,6 +385,17 @@ void tank_turn(int16 angle){
     
     SetMotors(left_wheel,right_wheel, 200, 200, delay);
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 

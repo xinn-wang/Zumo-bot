@@ -35,6 +35,9 @@ void w3_a3(void);
 void w4_a1(void);
 void w4_a2(void);
 void w4_a3(void);
+void w5_a1(void);
+void w5_a2(void);
+void w5_a3(void);
 void tank_turn(int16 angle);
 
 
