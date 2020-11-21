@@ -150,10 +150,11 @@ void w4_a1(void){
     }
 
 }
+
 void w4_a2(void){
     printf("Please put the robort at the start line\n");
     struct sensors_ dig;
-    reflectance_set_threshold(9000, 9000, 11000, 11000, 9000, 9000);
+    reflectance_set_threshold(15000, 15000, 18000, 18000, 15000, 15000);
     
     reflectance_start();
     IR_Start();
@@ -167,34 +168,98 @@ void w4_a2(void){
     vTaskDelay(1000);
     
     int count = 0;
-    reflectance_digital(&dig);
-    IR_wait();
+    int touching = 0;
+    
     while(count < 2){
         reflectance_digital(&dig);
-        while(dig.L1 == 1 && dig.R1 == 1){
-        motor_forward(70,0);
         
-        if(dig.L1 == 0){
-            motor_turn(50,0,50);
-        }
-     
-        if(dig.R1 == 0){
-            motor_turn(0,50,50);
-        }
- 
-        if(dig.L3 == 1 && dig.L2 == 1 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 1 && dig.R3 == 1){
+        if (touching == 0 && dig.L3 == 1 && dig.L2 == 1 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 1 && dig.R3 == 1) {
             count++;
+            touching = 1;
+            if (count == 1) {
+                printf("\nWaiting for IR signal.\n");
+                motor_forward(0, 0);
+                IR_wait();
+                printf("\nIR signal received.\n");
+            }
+        }
+        if (touching == 1 && dig.L3 == 0 && dig.L2 == 0 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 0 && dig.R3 == 0) {
+            touching = 0;
+        }
+        while (dig.L2 == 1 && dig.R2 == 0){
+            tank_turn(1);
+            reflectance_digital(&dig);
         }
         
+        while (dig.R2 == 1 && dig.L2 == 0){
+            tank_turn(-1);
+            reflectance_digital(&dig);
         }
+        
+        
+        
+        
+        motor_forward(255, 0);
+        
     }
-    while(count == 2) {
-        motor_forward(0,0);
-    }
-    
     motor_stop();
     printf("\nHappy Birthday!");
 
+}
+
+void w4_a3(void){
+    printf("Please put the robort at the start line\n");
+    struct sensors_ dig;
+    reflectance_set_threshold(15000, 15000, 18000, 18000, 15000, 15000);
+    
+    reflectance_start();
+    IR_Start();
+    motor_start();
+    motor_forward(0,0);
+    
+    BatteryLed_Write(1);
+    while (SW1_Read()==1);
+    printf("Move starts");
+    BatteryLed_Write(0);
+    vTaskDelay(1000);
+    
+    int count = 0;
+    int touching =0;
+    
+     while(count < 5){
+        reflectance_digital(&dig);
+        
+        if (touching == 0 && dig.L3 == 1 && dig.L2 == 1 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 1 && dig.R3 == 1) {
+            count++;
+            touching = 1;
+            if (count == 1) {
+                printf("\nWaiting for IR signal.\n");
+                motor_forward(0, 0);
+                IR_wait();
+                printf("\nIR signal received.\n");
+            }
+        }
+        if (touching == 1 && dig.L3 == 0 && dig.L2 == 0 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 0 && dig.R3 == 0) {
+            touching = 0;
+        }
+        if (count == 2){
+            while(! (dig.L2 == 0 && dig.L1 == 1 && dig.R1 ==1 && dig.R2 == 0)){
+            motor_turn(5,160,0);
+            reflectance_digital(&dig);
+            }
+            motor_forward(255, 0);
+        }
+        if(count == 3 || count == 4){
+            while(!(dig.L2 == 0 && dig.L1 == 1 && dig.R1 ==1 && dig.R2 == 0)){
+            motor_turn(160,5,0);
+            reflectance_digital(&dig);
+            }
+            motor_forward(255, 0);
+        }
+        motor_forward(255, 0);
+    }      
+    motor_stop();
+    printf("\nHappy Birthday!");
 }
 
 

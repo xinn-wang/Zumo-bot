@@ -30,6 +30,15 @@
 #include <unistd.h>
 
 
+void make3_1(void);
+void make3_2(void);
+void make3_3(void); 
 void make4_1(void);
+void make4_2(void);
+void make4_3(void);
+void make5_1(void);
+void make5_2(void);
+void make5_3(void); 
+
 
 /* [] END OF FILE */

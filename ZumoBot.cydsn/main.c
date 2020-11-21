@@ -45,21 +45,7 @@
 void zmain(void)
 {
 
-     //lineFollowing();
-     //Distancesensor();
-     //randomTurn();
-     //Reflectorsensors();
-     //week4_assignment2();
-     //week4_assignment3();
-      week5_assignment1();
-    
 
-
-
-    w4_a2();
-
-    printf("\nHello, World!\n");
- 
 
     while(true){
         vTaskDelay(100);
