@@ -34,6 +34,10 @@ void lineFollowing(void);
 void Distancesensor(void);
 void randomTurn(void);
 void Reflectorsensors(void);
+void week4_assignment2(void);
+void week4_assignment3(void);
+void week5_assignment1(void);
+
 void tanketurn(int16 angle);
 
 /* [] END OF FILE */
