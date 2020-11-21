@@ -12,6 +12,7 @@
 
 #include "subash.h"
 #define STOP 5
+#define group10 "Zumo10/button"
 
 //week3_assignment 1
 void lineFollowing(void){
@@ -102,7 +103,7 @@ void randomTurn(void){
 
 
 
-//week4_assignment4
+//week4_assignment1
 void Reflectorsensors(void){
     printf("\n Robot moves to 5th line\n");
     struct sensors_ dig;
@@ -150,7 +151,186 @@ void Reflectorsensors(void){
     }
 
 }
+
+//week4_assignment2
+
+void week4_assignment2(void){
     
+    printf("The robot is ready to move\n");
+    struct sensors_ dig;
+    reflectance_set_threshold(9000, 9000, 11000, 11000, 9000, 9000);
+    
+    reflectance_start();
+    IR_Start();
+    motor_start();
+    motor_forward(0,0);
+    
+    BatteryLed_Write(1);
+    while (SW1_Read()==1);
+    printf("Robot stops");
+    BatteryLed_Write(0);
+    vTaskDelay(1000);
+    
+    int count = 0;
+    
+    
+    reflectance_digital(&dig);
+    motor_forward(60,0);
+    
+    while(count < 2) {
+        reflectance_digital(&dig);
+        if ((dig.L3 == 1)&&(dig.R3 == 1)) {
+            count++;
+            if (count == 1) {
+               IR_Start();
+            }
+            while (dig.L3== 1 && dig.R3 == 1){
+                reflectance_digital(&dig);
+            }
+        }
+        
+        if(dig. L1 == 0){
+            motor_turn(50,0,0);
+        }
+        if(dig.R1 == 0){
+            motor_turn(0,50,0);
+        }
+        if((dig.L1 == 1)&&(dig.R1 == 1))
+           motor_forward(50,0);
+       
+    }
+  
+    motor_forward(0,0);
+    motor_stop();
+    while(true) {
+        vTaskDelay(100);
+    }
+
+
+}
+
+void week4_assignment3(void){
+
+    printf("\n Robot stops on the first line\n");
+    struct sensors_ dig;
+    int count = 0;
+    
+    
+    reflectance_set_threshold(15000, 15000, 15000, 15000, 15000, 15000);
+    
+    reflectance_start();
+    IR_Start();
+    motor_start();
+    motor_forward(0,0);
+    
+    while (SW1_Read()== 1);
+    BatteryLed_Write(1);
+    vTaskDelay(1000);
+    BatteryLed_Write(0);
+    
+    reflectance_digital(&dig);
+    
+    
+    while(count < STOP){
+        reflectance_digital(&dig);
+        
+        while (dig.L3 == 1 && dig.L2 == 1 &&dig.L1 == 1 &&dig.R1 == 1 &&dig.R2 == 1 &&dig.R3 == 1){
+            motor_forward(100, 10);
+            reflectance_digital(&dig);
+        
+        }
+        
+        while (!(dig.L3 == 1 && dig.L2 == 1 &&dig.L1 == 1 &&dig.R1 == 1 &&dig.R2 == 1 &&dig.R3 == 1)){
+            while (dig.L2 == 1 && dig.R2 == 0){
+                tanketurn(1);
+                reflectance_digital(&dig);
+            }
+            while (dig.L2 == 0 && dig.R2 == 1){
+                tanketurn(-1);
+                reflectance_digital(&dig);
+            }
+            
+            motor_forward(100, 10);
+            reflectance_digital(&dig);
+        }
+        
+        count++;
+        printf("count is %d\n", count);
+        
+        if (count == 1){
+            motor_forward(0, 0);
+            IR_wait();
+        }
+        
+        if (count == 2){
+             while (!(dig.L3 == 0 && dig.L2 == 0 &&dig.L1 == 1 &&dig.R1 == 1 &&dig.R2 == 0 &&dig.R3 == 0)){
+            motor_turn(0,100,10);
+            reflectance_digital(&dig);
+            }
+//            motor_forward(50, 0);
+        }
+        if (count == 3 || count == 4){
+            
+            
+            while (!(dig.L3 == 0 && dig.L2 == 0 &&dig.L1 == 1 &&dig.R1 == 1 &&dig.R2 == 0 &&dig.R3 == 0)){
+            motor_turn(100,0,10);
+            reflectance_digital(&dig);
+            }
+           
+        }
+        if (count == 5){
+            printf("motor is stopping");
+            motor_forward(0,0);
+           motor_stop ();
+           break;
+       
+       }
+        
+        
+
+        
+    }
+    while(true){
+    vTaskDelay(1000);
+    }
+}
+ 
+    
+
+
+void week5_assignment1(void){
+    print_mqtt(group10, "hello world%d\n");
+    int time_gapping = 0;
+
+    while(true) {
+        printf("Press button within 5 seconds!\n");
+	    TickType_t Ttime = xTaskGetTickCount(); // take start time
+        bool timeout = false;
+        while(SW1_Read() == 1) {
+            if(xTaskGetTickCount() - Ttime > 50000U) { // too long time since start
+                timeout = true;
+                break;
+            }
+            vTaskDelay(10);
+        }
+        if(timeout) {
+            printf("Press the button\n");
+        }
+        else {
+            printf("Good work\n");
+            while(SW1_Read() == 0) vTaskDelay(10); // wait until button is released
+            time_gapping = xTaskGetTickCount() - Ttime;
+            printf("Time gapping is %d.\n", time_gapping);
+        }
+    }
+
+}
+
+
+
+
+
+
 void tanketurn(int16 angle){
      uint8 left_wheel = 0,right_wheel =0;
     if (angle < 0 ){
@@ -166,6 +346,10 @@ void tanketurn(int16 angle){
     
     SetMotors(left_wheel,right_wheel, 200, 200, delay);
 }
+
+
+
+
 
 
 
