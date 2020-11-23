@@ -190,9 +190,9 @@ void make4_2(void)
 
 void make4_3(void) {
     
-      printf("Place Mr.Zumo at the start line\n");
+   printf("Please put the robort at the start line\n");
     struct sensors_ dig;
-    reflectance_set_threshold(9000, 9000, 11000, 11000, 9000, 9000);
+    reflectance_set_threshold(15000, 15000, 18000, 18000, 15000, 15000);
     
     reflectance_start();
     IR_Start();
@@ -201,51 +201,54 @@ void make4_3(void) {
     
     BatteryLed_Write(1);
     while (SW1_Read()==1);
-    printf("Here we go");
+    printf("Move starts");
     BatteryLed_Write(0);
     vTaskDelay(1000);
     
-    int count = 0;
-    int turns = 0; 
-    
     reflectance_digital(&dig);
-    motor_forward(60,0);
     
-    while(count < 5) {
+    
+    int count = 0;
+    int touching =0;
+    
+     while(count < 5){
         reflectance_digital(&dig);
-            while ((dig.L3 == 1 && dig.L2 == 1 &&dig.L1 == 1 &&dig.R1 == 1 &&dig.R2 == 1 &&dig.R3 == 1) && count == 2){
-                printf("\n Turning left\n");
-                reflectance_digital(&dig);
-               
-                
+        
+        if (touching == 0 && dig.L3 == 1 && dig.L2 == 1 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 1 && dig.R3 == 1) {
+            count++;
+            touching = 1;
+            if (count == 1) {
+                printf("\nWaiting for IR signal.\n");
+                motor_forward(0, 0);
+                IR_wait();
             }
-                if(dig.L2 == 0 && dig.R2 == 1){
-                motor_turn(60,0,10);
-                }
-                if(dig.R2 == 0 && dig.L2 == 1){
-                motor_turn(0,60,10);
-                }
-                if(dig.L3 == 0 && dig.R3 == 1){
-                motor_turn(60,0,10);
-                }
-                if(dig.R3 == 0 && dig.L3 == 1){
-                motor_turn(0,60,10);
-                }
-                if((dig.L1 == 1)&&(dig.R1 == 1))
-                motor_forward(60,0);
-    
-                
-
         }
-    
-    motor_forward(0,0);
-    motor_stop();
-    while(true) {
-        vTaskDelay(100);
+        if (touching == 1 && dig.L3 == 0 && dig.L2 == 0 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 0 && dig.R3 == 0) {
+            touching = 0;
+        }
+        if (count == 2){
+            while(! (dig.L2 == 0 && dig.L1 == 1 && dig.R1 ==1 && dig.R2 == 0)){
+            motor_turn(5,160,0);
+            reflectance_digital(&dig);
+            }
+            motor_forward(100, 0);
+        }
+        if(count == 3 || count == 4){
+            while(!(dig.L2 == 0 && dig.L1 == 1 && dig.R1 ==1 && dig.R2 == 0)){
+            motor_turn(160,5,0);
+            reflectance_digital(&dig);
+            }
+            motor_forward(100, 0);
+        }
+        if(count == 5 && dig.L3 == 1 && dig.L2 == 1 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 1 && dig.R3 == 1 ) {
+            motor_turn(0,0,0);
+            reflectance_digital(&dig);
+            motor_stop();
+        }
+        motor_forward(100,0);
     }
-}
-
-
-
-
+    
+    motor_stop();
+    printf("\nYou made it!!\n");
+    }      
 
