@@ -44,13 +44,9 @@
 // Hello World!
 void zmain(void)
 {
+    
+        while(true){
 
-    make4_3();
-
-    printf("\nHello, World!\n");
- 
-
-    while(true){
         vTaskDelay(100);
 
     }
