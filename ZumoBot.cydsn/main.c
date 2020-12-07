@@ -44,8 +44,7 @@
 // Hello World!
 void zmain(void)
 {
-   
-    
+  project_3();
         while(true){
 
         vTaskDelay(100);
