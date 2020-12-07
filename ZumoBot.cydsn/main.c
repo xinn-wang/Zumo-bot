@@ -43,11 +43,7 @@
 // Hello World!
 void zmain(void)
 {
-    maze_xin();
-    while(true) {
-        vTaskDelay(100);
-    }
-
+    
  }   
 #endif
 
