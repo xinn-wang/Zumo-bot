@@ -33,7 +33,6 @@
 #include "subash.h"
 #include "miguel.h"
 
-
 /**
  * @file    main.c
  * @brief   
@@ -44,12 +43,11 @@
 // Hello World!
 void zmain(void)
 {
-    
-        while(true){
-
+    maze_xin();
+    while(true) {
         vTaskDelay(100);
-
     }
+
  }   
 #endif
 
@@ -205,7 +203,7 @@ void zmain(void)
     while(true) {
         int d = Ultra_GetDistance();
         // Print the detected distance (centimeters)
-        printf("distance = %d\r\n", d);
+        printf("distance = %d\n", d);
         vTaskDelay(200);
     }
 }   

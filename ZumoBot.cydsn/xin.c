@@ -15,13 +15,13 @@
 
 //Week3_assignment_1
 void w3_a1(void){
-    printf("Please put the robort to the start line");
+    printf("Please put the robort to the start line\n");
     motor_start();      
     motor_forward(0,0);
     
     BatteryLed_Write(1);
     while (SW1_Read()==1);
-    printf("Moving starts");
+    printf("Moving starts\n");
     BatteryLed_Write(0);
     vTaskDelay(1000);
     motor_forward(167,2000);
@@ -44,15 +44,15 @@ void w3_a1(void){
 
 
 void w3_a2(void){
-    printf("Robot starts!");
-    Ultra_Start();                          // Ultra Sonic Start function
+    printf("Robot starts!\n");
+    Ultra_Start();                         
     motor_start();      
     motor_forward(0,0);
     
     
     BatteryLed_Write(1);
     while (SW1_Read()==1);
-    printf("Light off");
+    printf("Light off\n");
     BatteryLed_Write(0);
     vTaskDelay(1000);
      
@@ -72,7 +72,7 @@ void w3_a2(void){
 
 
 void w3_a3(void){
-    printf("Robot starts!");
+    printf("Robot starts!\n");
     Ultra_Start();                          
     motor_start();      
     motor_forward(0,0);
@@ -80,7 +80,7 @@ void w3_a3(void){
     
     BatteryLed_Write(1);
     while (SW1_Read()==1);
-    printf("Light off");
+    printf("Light off\n");
     BatteryLed_Write(0);
     vTaskDelay(1000);
     
@@ -263,7 +263,7 @@ void w4_a3(void){
 }
 
 void w5_a1(void){
-    send_mqtt("Zumo101/turn","Time recording");
+    send_mqtt("Zumo10/turn","Time recording");
     
     TickType_t time0;
     TickType_t time1;
@@ -283,7 +283,7 @@ void w5_a1(void){
         while (SW1_Read() == 1);
         time1 = xTaskGetTickCount();
         int t = time1 - time0;
-        print_mqtt("Zumo101/button", "since last button push: %d s.\n", t/1000);
+        print_mqtt("Zumo10/button", "since last button push: %d s.\n", t/1000);
         while (SW1_Read() ==0);
         time0 = time1;
     }
@@ -292,7 +292,7 @@ void w5_a1(void){
 
 
 void w5_a2(void){
-    send_mqtt("Zumo101/turn","Turning");
+    send_mqtt("Zumo10/turn","Turning");
     Ultra_Start();                         
     motor_start();      
     motor_forward(0,0);
@@ -311,11 +311,11 @@ void w5_a2(void){
             int t = rand()%2;
             if(t == 1){
             tank_turn(90);
-            print_mqtt("Zumo101/turn","Turn left 90 degrees");
+            print_mqtt("Zumo10/turn","Turn left 90 degrees");
             }
             else if (t == 0){
             tank_turn(-90);
-            print_mqtt("Zumo101/turn","Turn right 90 degrees");
+            print_mqtt("Zumo10/turn","Turn right 90 degrees");
             }
         }
 
@@ -324,7 +324,7 @@ void w5_a2(void){
     motor_stop();
 }
 void w5_a3(void){
-    send_mqtt("Zumo101/lap","Count time");
+    send_mqtt("Zumo10/lap","Count time");
     struct sensors_ dig;
     reflectance_set_threshold(15000, 15000, 18000, 18000, 15000, 15000);
     
@@ -336,7 +336,7 @@ void w5_a3(void){
     
     BatteryLed_Write(1);
     while (SW1_Read()==1);
-    print_mqtt("Zumo101/lap","Move starts");
+    print_mqtt("Zumo10/lap","Move starts");
     BatteryLed_Write(0);
     vTaskDelay(1000);
     
@@ -352,10 +352,10 @@ void w5_a3(void){
             touching = 1;
             if (count == 1) {
                 motor_forward(0, 0);
-                print_mqtt("Zumo101/lap","Waiting to IR signal");
+                print_mqtt("Zumo10/lap","Waiting to IR signal");
                 IR_wait();
                 time = xTaskGetTickCount();
-                print_mqtt("Zumo101/lap","Time counting starts");
+                print_mqtt("Zumo10/lap","Time counting starts");
             }
         }
         if (touching == 1 && dig.L3 == 0 && dig.L2 == 0 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 0 && dig.R3 == 0) {
@@ -366,8 +366,153 @@ void w5_a3(void){
         
     }
     motor_stop();
-    print_mqtt("Zumo101/lap","Time costs %d s", time/1000);
+    print_mqtt("Zumo10/lap","Time costs %d s", time/1000);
 
+}
+
+
+void line_follower(void){
+    send_mqtt("Zumo10/ready","line");
+    struct sensors_ dig;
+    reflectance_set_threshold(15000, 15000, 18000, 18000, 15000, 15000);
+    
+    reflectance_start();
+    IR_Start();
+    motor_start();
+    motor_forward(0,0);
+    TickType_t t0;
+    TickType_t t1;
+    TickType_t t2;
+    TickType_t t3;
+    BatteryLed_Write(1);
+    while (SW1_Read()==1);
+    
+    BatteryLed_Write(0);
+    vTaskDelay(1000);
+    
+    int count = 0;
+    int touching = 0;
+    
+    while(count < 3){
+        reflectance_digital(&dig);
+        
+        if (touching == 0 && dig.L3 == 1 && dig.L2 == 1 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 1 && dig.R3 == 1) {
+            count++;
+            touching = 1;
+            if (count == 1) {
+                motor_forward(0, 0);
+                IR_wait();
+                t0 = xTaskGetTickCount();
+                print_mqtt("Zumo10/start", "%d", t0);
+                
+            }
+        }
+        if ((dig.L1 == 0 && dig.R1 == 1) || (dig.R1 == 0 && dig.L1 == 1)){
+            t1 = xTaskGetTickCount();
+            print_mqtt("Zumo10/miss", "%d", t1);
+            while(dig.L1 == 1 && dig.R1 == 0){
+            tank_turn(1);
+            reflectance_digital(&dig);
+            }
+            while(dig.L1 == 0 && dig.R1 == 1){
+            tank_turn(-1);
+            reflectance_digital(&dig);
+            }
+            t2 = xTaskGetTickCount();
+            print_mqtt("Zumo10/line", "%d", t2);
+        
+        }
+        if (touching == 1 && dig.L3 == 0 && dig.L2 == 0 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 0 && dig.R3 == 0) {
+            touching = 0;
+        }
+//        while (dig.L2 == 1 && dig.R2 == 0){
+//            tank_turn(1);
+//            reflectance_digital(&dig);
+//        }
+//        while (dig.R2 == 1 && dig.L2 == 0){
+//            tank_turn(-1);
+//            reflectance_digital(&dig);
+//        }
+        motor_forward(255, 0);
+        
+    }
+    motor_forward(0,0);
+    motor_stop();
+    t3 = xTaskGetTickCount();
+    print_mqtt("Zumo10/stop","%d", t3);
+    
+    int t = t3 - t0;
+    print_mqtt("Zumo10/time","%d", t);
+    
+
+}
+
+void maze_xin(void){
+    printf("Robot starts!\n");
+    reflectance_start();
+    Ultra_Start();                         
+    motor_start();      
+    motor_forward(0,0);
+    struct sensors_ dig;
+    
+    reflectance_set_threshold(9000, 9000, 11000, 11000, 9000, 9000);
+    
+    BatteryLed_Write(1);
+    while (SW1_Read()== 1);
+    vTaskDelay(1000);
+    BatteryLed_Write(0);
+    
+    int count = 0;
+    int touching = 0;
+    
+    while(true){
+        reflectance_digital(&dig);
+        int d = Ultra_GetDistance();
+        printf("distance is %d\n", d);
+        if (touching == 0 && dig.L3 == 1 && dig.L2 == 1 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 1 && dig.R3 == 1) {
+            count++;
+            touching = 1;
+            if (count == 1) {
+                motor_forward(0, 0);
+                IR_wait();
+            }
+        }
+        
+        if (touching == 1){
+            if( d <= 12){
+                motor_forward(0,0);
+                reflectance_digital(&dig);
+                while(! (dig.L2 == 0 && dig.L1 == 1 && dig.R1 ==1 && dig.R2 == 0)){
+                    motor_turn(5,160,0);
+                    reflectance_digital(&dig);
+                }   
+            }
+            if (count == 6){
+            while(! (dig.L2 == 0 && dig.L1 == 1 && dig.R1 ==1 && dig.R2 == 0)){
+                motor_turn(160,5,0);
+                reflectance_digital(&dig);
+                }   
+            }
+        }
+        
+        if (touching == 1 && dig.L3 == 0 && dig.L2 == 0 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 0 && dig.R3 == 0) {
+            touching = 0;
+        }
+        
+        if ((dig.L1 == 0 && dig.R1 == 1) || (dig.R1 == 0 && dig.L1 == 1)){
+            while(dig.L1 == 1 && dig.R1 == 0){
+            tank_turn(1);
+            reflectance_digital(&dig);
+            }
+            while(dig.L1 == 0 && dig.R1 == 1){
+            tank_turn(-1);
+            reflectance_digital(&dig);
+            }
+        }
+        motor_forward(20, 0);
+    } 
+    motor_forward(0,0);
+    motor_stop();
 }
 
 void tank_turn(int16 angle){
