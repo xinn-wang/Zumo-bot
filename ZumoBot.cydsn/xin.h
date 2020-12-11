@@ -29,6 +29,7 @@
 #include "serial1.h"
 #include <unistd.h>
 #include <stdlib.h>
+struct robot;
 void w3_a1(void);
 void w3_a2(void);
 void w3_a3(void);
@@ -45,6 +46,6 @@ void tank_turn(int16 angle);
 void track_line(void);
 void left_turn(void);
 void right_turn(void);
-void correct_direction(int direction);
+void correct_direction(struct robot *robot_coordinate );
 
 /* [] END OF FILE */

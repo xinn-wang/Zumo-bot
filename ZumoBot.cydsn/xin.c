@@ -542,20 +542,20 @@ void maze_xin(void){
     
 }
 /////////////MAZE-START-FROM-HERE/////////////
-#define north 1
+#define north 0
 #define east 1
-#define west -1
-#define south -1
+#define west 2
+#define south 3
 
 struct robot{
-    int x;
-    int y;
-    int direction;
+    int16 x;
+    int16 y;
+    int16 direction;
 };
 
 void maze_test(void){
     struct sensors_ dig;
-    struct robot robot_coordinate ={ .x = 0, .y = 0, .direction = 0};
+    struct robot robot_coordinate ={ .x = 0, .y = -1, .direction = north};
  
     reflectance_start();
     Ultra_Start();  
@@ -568,42 +568,86 @@ void maze_test(void){
     while (SW1_Read()== 1);
     vTaskDelay(1000);
     BatteryLed_Write(0);
-    printf("Robot starts!\n");
     
     int count = 0;
     int touching = 0;
     int round = 0;
-    
+    TickType_t t0;
+    TickType_t t1;
+    t0 = xTaskGetTickCount();
     while(true){
         reflectance_digital(&dig);
         int d = Ultra_GetDistance();
-       
-        if ((touching == 0 && dig.L3 == 1 && dig.L2 == 1 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 1 && dig.R3 == 1)||(touching == 0 && dig.L3 == 0 && dig.L2 == 0 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 1 && dig.R3 == 1)||(touching == 0 && dig.L3 == 1 && dig.L2 == 1 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 0 && dig.R3 == 0)) {
+        
+        if ((touching == 0 && dig.L3 == 1 && dig.L2 == 1 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 1 && dig.R3 == 1)||(touching == 0 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 1 && dig.R3 == 1)||(touching == 0 && dig.L3 == 1 && dig.L2 == 1 && dig.L1 == 1 && dig.R1 == 1)) {
             count++;
             touching = 1;
+            if(robot_coordinate.direction == north){
+                robot_coordinate.y += 1;
+            }
+            else if( robot_coordinate.direction == south){
+                robot_coordinate.y -= 1;
+            }
+            else if(robot_coordinate.direction == east){
+                robot_coordinate.x += 1;
+            }
+            else if( robot_coordinate.direction == west){
+                robot_coordinate.x -= 1;
+            }
             if (count == 1) {
                 motor_forward(0, 0);
                 robot_coordinate.x = 0;
                 robot_coordinate.y = -1;
                 robot_coordinate.direction = north;
+                print_mqtt("Zumo10/ready", "maze");
                 IR_wait();
+                print_mqtt("Zumo10/start", "%d", t0);
+            }
+            print_mqtt("Zumo10/position", "(%d, %d)",robot_coordinate.x,robot_coordinate.y);
+            
+        }
+        if(touching == 1){
+//            printf("distance is %d\n", d);
+            reflectance_digital(&dig);
+            if( d <= 12){
+                round++;
+                motor_forward(0,0);
+            }
+            if (round == 1 && d <= 12){
+                left_turn(); 
+                robot_coordinate.direction = west;
+            }
+            if (robot_coordinate.x == -3 && d <= 12){
+                right_turn(); 
+                robot_coordinate.direction = east;
+            }
+            if (robot_coordinate.x == 3 && d <= 12){
+                left_turn(); 
+                robot_coordinate.direction = west;
+            }
+            if (robot_coordinate.x == 0 && robot_coordinate.y == 8 && robot_coordinate.direction == west ){
+                correct_direction(&robot_coordinate);
+            }
+            if (robot_coordinate.x == 3 && robot_coordinate.y == 11){
+                left_turn(); 
+                robot_coordinate.direction = west;
+            }
+            if (robot_coordinate.x == 0 && robot_coordinate.y == 11){
+                correct_direction(&robot_coordinate);
             }
         }
-        if(robot_coordinate.y < 13 && robot_coordinate.x >= -3 && robot_coordinate.x <= 3) {
+        if (robot_coordinate.y < 13 && robot_coordinate.x >= -3 && robot_coordinate.x <= 3) {
             
             if(robot_coordinate.x == -3 && robot_coordinate.direction == west) {
                 right_turn();
                 robot_coordinate.direction = north;
             } 
-            else if(robot_coordinate.x == 3 && robot_coordinate.direction == west) {
+            else if(robot_coordinate.x == 3 && robot_coordinate.direction == east) {
                 left_turn();
                 robot_coordinate.direction = north;
             }
-        }    
+        } 
         
-//        if (robot_coordinate.x == 0){
-//            correct_direction(robot_coordinate.direction);
-//        }
         if (touching == 1 && dig.L3 == 0 && dig.L2 == 0 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 0 && dig.R3 == 0) {
             touching = 0;
         }
@@ -615,30 +659,20 @@ void maze_test(void){
         if ( dig.L3 == 0 && dig.L2 == 0 && dig.L1 == 0 && dig.R1 == 0 && dig.R2 == 0 && dig.R3 == 0){
         motor_forward(0,0);
         motor_stop();
+        t1 = xTaskGetTickCount();
+        print_mqtt("Zumo10/stop","%d", t1);
+        int t = t1 - t0;
+        print_mqtt("Zumo10/time","%d", t);       
+        break;
         }
-        motor_forward(50, 10);
+        motor_forward(100, 10);
     } 
-    while (touching == 1){
-        reflectance_digital(&dig);
-        int d = Ultra_GetDistance();
-        if(robot_coordinate.direction == north || robot_coordinate.direction == south){
-             robot_coordinate.y += robot_coordinate.direction;
-        }
-        if(robot_coordinate.direction == west || robot_coordinate.direction == east){
-            robot_coordinate.x += robot_coordinate.direction;
-        }
-        print_mqtt("Zumo10/position", "(%d, %d)",robot_coordinate.x,robot_coordinate.y);
-        if( d <= 12){
-            round++;
-            motor_forward(0,0);
-            printf("round is %d\n", round);
-            print_mqtt("Zumo10/position", "(%d, %d)",robot_coordinate.x,robot_coordinate.y);
-        }
-        if (round == 1 && d <= 12){
-            left_turn(); 
-        }
-        
+    while(true){
+
+        vTaskDelay(100);
+
     }
+     
     
 }
 
@@ -692,14 +726,14 @@ void track_line(void){
         }
 
 }
-void correct_direction(int direction){
-    if (direction == east){
+void correct_direction(struct robot *robot_coordinate ){
+    if (robot_coordinate->direction == east){
         left_turn();
-        direction = north;
+        robot_coordinate->direction = north;
     }
-    else if(direction == west){
+    else if(robot_coordinate->direction == west){
         right_turn();
-        direction = north;
+        robot_coordinate->direction = north;
   
 }
 }
