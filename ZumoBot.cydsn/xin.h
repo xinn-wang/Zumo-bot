@@ -40,7 +40,11 @@ void w5_a2(void);
 void w5_a3(void);
 void line_follower(void);
 void maze_xin(void);
+void maze_test(void);
 void tank_turn(int16 angle);
-
+void track_line(void);
+void left_turn(void);
+void right_turn(void);
+void correct_direction(int direction);
 
 /* [] END OF FILE */

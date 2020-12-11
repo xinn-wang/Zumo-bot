@@ -450,7 +450,8 @@ void line_follower(void){
 void maze_xin(void){
     printf("Robot starts!\n");
     reflectance_start();
-    Ultra_Start();                         
+    Ultra_Start();  
+    IR_Start();
     motor_start();      
     motor_forward(0,0);
     struct sensors_ dig;
@@ -464,12 +465,14 @@ void maze_xin(void){
     
     int count = 0;
     int touching = 0;
+    int count_now;
+    int round = 0;
     
     while(true){
         reflectance_digital(&dig);
         int d = Ultra_GetDistance();
-        printf("distance is %d\n", d);
-        if (touching == 0 && dig.L3 == 1 && dig.L2 == 1 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 1 && dig.R3 == 1) {
+       // printf("distance is %d\n", d);
+        if ((touching == 0 && dig.L3 == 1 && dig.L2 == 1 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 1 && dig.R3 == 1)||(touching == 0 && dig.L3 == 0 && dig.L2 == 0 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 1 && dig.R3 == 1)||(touching == 0 && dig.L3 == 1 && dig.L2 == 1 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 0 && dig.R3 == 0)) {
             count++;
             touching = 1;
             if (count == 1) {
@@ -480,18 +483,39 @@ void maze_xin(void){
         
         if (touching == 1){
             if( d <= 12){
+                round++;
                 motor_forward(0,0);
+                count_now = count;
+                printf("round is %d\n", round);
+            }
+            if (round == 1 && d <= 12){
                 reflectance_digital(&dig);
                 while(! (dig.L2 == 0 && dig.L1 == 1 && dig.R1 ==1 && dig.R2 == 0)){
                     motor_turn(5,160,0);
                     reflectance_digital(&dig);
                 }   
             }
-            if (count == 6){
-            while(! (dig.L2 == 0 && dig.L1 == 1 && dig.R1 ==1 && dig.R2 == 0)){
-                motor_turn(160,5,0);
+            int b = count - count_now;
+            if (b == 2 && round == 1){
                 reflectance_digital(&dig);
+                while(! (dig.L2 == 0 && dig.L1 == 1 && dig.R1 ==1 && dig.R2 == 0)){
+                    motor_turn(160,5,0);
+                    reflectance_digital(&dig);
                 }   
+            }
+            if (round == 2 && d <= 12){
+                reflectance_digital(&dig);
+                while(! (dig.L2 == 0 && dig.L1 == 1 && dig.R1 ==1 && dig.R2 == 0)){
+                    motor_turn(160,5,0);
+                    reflectance_digital(&dig);
+                }  
+            }
+            if (b == 2 && round == 2){
+                reflectance_digital(&dig);
+                while(! (dig.L2 == 0 && dig.L1 == 1 && dig.R1 ==1 && dig.R2 == 0)){
+                    motor_turn(5,160,0);
+                    reflectance_digital(&dig);
+                }  
             }
         }
         
@@ -509,10 +533,113 @@ void maze_xin(void){
             reflectance_digital(&dig);
             }
         }
-        motor_forward(20, 0);
-    } 
-    motor_forward(0,0);
+        motor_forward(50, 10);
+        if ( dig.L3 == 0 && dig.L2 == 0 && dig.L1 == 0 && dig.R1 == 1 && dig.R2 == 0 && dig.R3 == 0){
+        motor_forward(0,0);
     motor_stop();
+        }
+    } 
+    
+}
+/////////////MAZE-START-FROM-HERE/////////////
+#define north 1
+#define east 1
+#define west -1
+#define south -1
+
+struct robot{
+    int x;
+    int y;
+    int direction;
+};
+
+void maze_test(void){
+    struct sensors_ dig;
+    struct robot robot_coordinate ={ .x = 0, .y = 0, .direction = 0};
+ 
+    reflectance_start();
+    Ultra_Start();  
+    IR_Start();
+    motor_start();      
+    motor_forward(0,0);
+    reflectance_set_threshold(9000, 9000, 11000, 11000, 9000, 9000);
+    
+    BatteryLed_Write(1);
+    while (SW1_Read()== 1);
+    vTaskDelay(1000);
+    BatteryLed_Write(0);
+    printf("Robot starts!\n");
+    
+    int count = 0;
+    int touching = 0;
+    int round = 0;
+    
+    while(true){
+        reflectance_digital(&dig);
+        int d = Ultra_GetDistance();
+       
+        if ((touching == 0 && dig.L3 == 1 && dig.L2 == 1 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 1 && dig.R3 == 1)||(touching == 0 && dig.L3 == 0 && dig.L2 == 0 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 1 && dig.R3 == 1)||(touching == 0 && dig.L3 == 1 && dig.L2 == 1 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 0 && dig.R3 == 0)) {
+            count++;
+            touching = 1;
+            if (count == 1) {
+                motor_forward(0, 0);
+                robot_coordinate.x = 0;
+                robot_coordinate.y = -1;
+                robot_coordinate.direction = north;
+                IR_wait();
+            }
+        }
+        if(robot_coordinate.y < 13 && robot_coordinate.x >= -3 && robot_coordinate.x <= 3) {
+            
+            if(robot_coordinate.x == -3 && robot_coordinate.direction == west) {
+                right_turn();
+                robot_coordinate.direction = north;
+            } 
+            else if(robot_coordinate.x == 3 && robot_coordinate.direction == west) {
+                left_turn();
+                robot_coordinate.direction = north;
+            }
+        }    
+        
+//        if (robot_coordinate.x == 0){
+//            correct_direction(robot_coordinate.direction);
+//        }
+        if (touching == 1 && dig.L3 == 0 && dig.L2 == 0 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 0 && dig.R3 == 0) {
+            touching = 0;
+        }
+        
+        if ((dig.L1 == 0 && dig.R1 == 1) || (dig.R1 == 0 && dig.L1 == 1)){
+            track_line();
+        }
+       
+        if ( dig.L3 == 0 && dig.L2 == 0 && dig.L1 == 0 && dig.R1 == 0 && dig.R2 == 0 && dig.R3 == 0){
+        motor_forward(0,0);
+        motor_stop();
+        }
+        motor_forward(50, 10);
+    } 
+    while (touching == 1){
+        reflectance_digital(&dig);
+        int d = Ultra_GetDistance();
+        if(robot_coordinate.direction == north || robot_coordinate.direction == south){
+             robot_coordinate.y += robot_coordinate.direction;
+        }
+        if(robot_coordinate.direction == west || robot_coordinate.direction == east){
+            robot_coordinate.x += robot_coordinate.direction;
+        }
+        print_mqtt("Zumo10/position", "(%d, %d)",robot_coordinate.x,robot_coordinate.y);
+        if( d <= 12){
+            round++;
+            motor_forward(0,0);
+            printf("round is %d\n", round);
+            print_mqtt("Zumo10/position", "(%d, %d)",robot_coordinate.x,robot_coordinate.y);
+        }
+        if (round == 1 && d <= 12){
+            left_turn(); 
+        }
+        
+    }
+    
 }
 
 void tank_turn(int16 angle){
@@ -530,6 +657,53 @@ void tank_turn(int16 angle){
     
     SetMotors(left_wheel,right_wheel, 200, 200, delay);
 }
+void left_turn(void){
+    struct sensors_ dig;
+    reflectance_start();
+    reflectance_set_threshold(9000, 9000, 11000, 11000, 9000, 9000);
+    reflectance_digital(&dig);
+    while(! (dig.L2 == 0 && dig.L1 == 1 && dig.R1 ==1 && dig.R2 == 0)){
+        motor_turn(5,160,0);
+        reflectance_digital(&dig);
+    }   
+}
+void right_turn(void){
+    struct sensors_ dig;
+    reflectance_start();
+    reflectance_set_threshold(9000, 9000, 11000, 11000, 9000, 9000);
+    reflectance_digital(&dig);
+    while(! (dig.L2 == 0 && dig.L1 == 1 && dig.R1 ==1 && dig.R2 == 0)){
+        motor_turn(160,5,0);
+        reflectance_digital(&dig);
+    } 
+}
+void track_line(void){
+    struct sensors_ dig;
+    reflectance_start();
+    reflectance_set_threshold(9000, 9000, 11000, 11000, 9000, 9000);
+    reflectance_digital(&dig);
+    while(dig.L1 == 1 && dig.R1 == 0){
+        tank_turn(1);
+        reflectance_digital(&dig);
+        }
+    while(dig.L1 == 0 && dig.R1 == 1){
+        tank_turn(-1);
+        reflectance_digital(&dig);
+        }
+
+}
+void correct_direction(int direction){
+    if (direction == east){
+        left_turn();
+        direction = north;
+    }
+    else if(direction == west){
+        right_turn();
+        direction = north;
+  
+}
+}
+
 
 
 

@@ -41,19 +41,9 @@
 
 #if 1
 // Hello World!
-void zmain(void)
-{
-<<<<<<< HEAD
-  project_3();
-        while(true){
-
-        vTaskDelay(100);
-
-    }
-=======
+void zmain(void){
     
->>>>>>> 00d4f3b78b969dfbee21bff4d96a24487d3b0056
- }   
+}
 #endif
 
 #if 0
