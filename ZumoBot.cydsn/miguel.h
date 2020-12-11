@@ -28,8 +28,11 @@
 #include <sys/time.h>
 #include "serial1.h"
 #include <unistd.h>
+#include <stdlib.h>
 
-
+void MotorReflexs();
+void BatteryLed();
+void tank_turns(int16 angle);
 void make3_1(void);
 void make3_2(void);
 void make3_3(void); 
@@ -40,5 +43,6 @@ void make5_1(void);
 void make5_2(void);
 void make5_3(void); 
 
+void project_3(void);
 
 /* [] END OF FILE */

@@ -345,10 +345,6 @@ void sumowrestling(void)
     reflectance_set_threshold(9000, 9000, 11000, 11000, 9000, 9000); 
     IR_Start();
     
-    
-    
-    
-    
     vTaskDelay(1000);
     reflectance_digital(&dig);
     
