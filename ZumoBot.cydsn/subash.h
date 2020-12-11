@@ -37,6 +37,7 @@ void Reflectorsensors(void);
 void week4_assignment2(void);
 void week4_assignment3(void);
 void week5_assignment1(void);
+void sumowrestling(void);
 
 void tanketurn(int16 angle);
 

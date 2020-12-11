@@ -14,6 +14,7 @@
 #define STOP 5
 #define group10 "Zumo10/button"
 
+
 //week3_assignment 1
 void lineFollowing(void){
     
@@ -327,8 +328,91 @@ void week5_assignment1(void){
 }
 
 
+void sumowrestling(void)
+{
+    struct sensors_ dig;
+    TickType_t start = 0;
+    TickType_t end = 0;
+   
+    xTaskGetTickCount();
+    printf("\n\n");
+    send_mqtt ("Zumo10/ready", "zumo");
+    
+    motor_start();
+    Ultra_Start();
+    motor_forward(0,0);
+    reflectance_start();
+    reflectance_set_threshold(9000, 9000, 11000, 11000, 9000, 9000); 
+    IR_Start();
+    
+    
+    
+    
+    
+    vTaskDelay(1000);
+    reflectance_digital(&dig);
+    
+    
+    while(SW1_Read())
+        BatteryLed_Write(1);
+        vTaskDelay(2000);
+        BatteryLed_Write(0);
+      
+    while(dig.L1 == 1 && dig.R1 == 1)
+    {
+        motor_forward(100,10);
+        reflectance_digital(&dig);
+    }
+    motor_forward(0, 0);
+    IR_wait(); 
+    motor_forward(245, 300);
+    start = xTaskGetTickCount();
+    print_mqtt ("Zumo10/start", "%d", start);
+    
+    
 
+    while(true)
+    {   
+        reflectance_digital(&dig);
+ 
+       if(dig.L3==1 || dig.L2 ==1 || dig.L1==1) 
+        {
+           int angle = rand()%120 +90 ;
+           tanketurn(angle);
+           motor_forward(100,0);
+        
+        }
+        
+        if(dig.R3== 1 || dig.R2 == 1 || dig.R1 == 1) 
+        {
+           int angle = rand()%60 +90 ;
+           tanketurn(angle);
+           motor_forward(100,0);
+        }
 
+         int d = Ultra_GetDistance();
+             if( d < 10 ) 
+               {
+                int angle = rand()%150 +90 ;
+                tanketurn(angle);
+                
+                print_mqtt("Zumo10/obstacle", "%d", xTaskGetTickCount());
+                motor_forward(100,0);
+                
+               }
+                
+        if(SW1_Read() == 0) {
+            end = xTaskGetTickCount();
+            print_mqtt("Zumo10/stop", "%d", end);
+            print_mqtt("Zumo10/time", "%d", end - start);
+            motor_forward(0,0);
+            motor_stop();
+            break;
+        }
+    }
+}
+        
+ 
 
 
 void tanketurn(int16 angle){
