@@ -39,21 +39,201 @@
  * @details  ** Enable global interrupt since Zumo library uses interrupts. **<br>&nbsp;&nbsp;&nbsp;CyGlobalIntEnable;<br>
 */
 
-#if 1
+
+
+
+#if 0
 // Hello World!
 void zmain(void)
 {
+<<<<<<< HEAD
   project_3();
 
         while(true){
+=======
+    
+}
+#endif
+>>>>>>> b45b308a9c88d955c53becc248743b6712d0a751
+
+#if 0
+//Project 1: Sumo_wrestling 
+void zmain(void){
+    struct sensors_ dig;
+    TickType_t start = 0;
+    TickType_t end = 0;
+   
+    xTaskGetTickCount();
+    printf("\n\n");
+    send_mqtt ("Zumo10/ready", "zumo");
+    
+    motor_start();
+    Ultra_Start();
+    motor_forward(0,0);
+    reflectance_start();
+    reflectance_set_threshold(9000, 9000, 11000, 11000, 9000, 9000); 
+    IR_Start();
+    
+    vTaskDelay(1000);
+    reflectance_digital(&dig);
+    
+    
+    while(SW1_Read())
+        BatteryLed_Write(1);
+        vTaskDelay(2000);
+        BatteryLed_Write(0);
+      
+    while(dig.L1 == 1 && dig.R1 == 1)
+    {
+        motor_forward(100,10);
+        reflectance_digital(&dig);
+    }
+    motor_forward(0, 0);
+    IR_wait(); 
+    motor_forward(245, 300);
+    start = xTaskGetTickCount();
+    print_mqtt ("Zumo10/start", "%d", start);
+    
+    
+
+    while(true)
+    {   
+        reflectance_digital(&dig);
+ 
+       if(dig.L3==1 || dig.L2 ==1 || dig.L1==1) 
+        {
+           int angle = rand()%120 +90 ;
+           tanketurn(angle);
+           motor_forward(100,0);
+        
+        }
+        
+        if(dig.R3== 1 || dig.R2 == 1 || dig.R1 == 1) 
+        {
+           int angle = rand()%60 +90 ;
+           tanketurn(angle);
+           motor_forward(100,0);
+        }
+
+         int d = Ultra_GetDistance();
+             if( d < 10 ) 
+               {
+                int angle = rand()%150 +90 ;
+                tanketurn(angle);
+                
+                print_mqtt("Zumo10/obstacle", "%d", xTaskGetTickCount());
+                motor_forward(100,0);
+                
+               }
+                
+        if(SW1_Read() == 0) {
+            end = xTaskGetTickCount();
+            print_mqtt("Zumo10/stop", "%d", end);
+            print_mqtt("Zumo10/time", "%d", end - start);
+            motor_forward(0,0);
+            motor_stop();
+            break;
+        }
+    }
+<<<<<<< HEAD
+
+ }   
+=======
+}
+
+    
+
+#endif
+
+#if 0
+//Project 2: line_follower
+void zmain(void){
+    print_mqtt("Zumo10/ready","line");
+    struct sensors_ dig;
+    reflectance_set_threshold(9000, 9000, 11000, 11000, 9000, 9000);
+    
+    reflectance_start();
+    IR_Start();
+    motor_start();
+    motor_forward(0,0);
+    TickType_t t0;
+    TickType_t t1;
+    TickType_t t2;
+    TickType_t t3;
+    BatteryLed_Write(1);
+    while (SW1_Read()==1);
+    
+    BatteryLed_Write(0);
+    vTaskDelay(1000);
+    
+    int count = 0;
+    int touching = 0;
+    
+    while(count < 3){
+        reflectance_digital(&dig);
+        
+        if (touching == 0 && dig.L3 == 1 && dig.L2 == 1 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 1 && dig.R3 == 1) {
+            count++;
+            touching = 1;
+            if (count == 1) {
+                motor_forward(0, 0);
+                IR_wait();
+                t0 = xTaskGetTickCount();
+                print_mqtt("Zumo10/start", "%d", t0);
+                
+            }
+        }
+        if ((dig.R1 != 1) || (dig.L1 != 1)){
+            t1 = xTaskGetTickCount();
+            print_mqtt("Zumo10/miss", "%d", t1);
+            while(dig.L1 == 1 && dig.R1 == 0){
+                tank_turn(1);
+                reflectance_digital(&dig);
+            }
+            while(dig.L1 == 0 && dig.R1 == 1){
+                tank_turn(-1);
+                reflectance_digital(&dig);
+            }
+            if (dig.L1 == 1 && dig.R1 == 1){
+            t2 = xTaskGetTickCount();
+            print_mqtt("Zumo10/line", "%d", t2);
+            }
+        }
+        
+        if (touching == 1 && dig.L3 == 0 && dig.L2 == 0 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 0 && dig.R3 == 0) {
+            touching = 0;
+        }
+        motor_forward(255, 0);
+        
+    }
+    
+    
+    motor_forward(0,0);
+    motor_stop();
+    t3 = xTaskGetTickCount();
+    print_mqtt("Zumo10/stop","%d", t3);
+    
+    int t = t3 - t0;
+    print_mqtt("Zumo10/time","%d", t);
+    
+    while(true){
 
         vTaskDelay(100);
 
     }
+}  
 
- }   
+
+>>>>>>> b45b308a9c88d955c53becc248743b6712d0a751
 #endif
 
+#if 0
+//project 3: Maze
+void zmain(void)
+{
+    
+}
+#endif
 #if 0
 // Name and age
 void zmain(void)
