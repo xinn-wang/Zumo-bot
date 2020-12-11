@@ -350,16 +350,81 @@ void project_1(void){
 }
 
 void project_2(void){
+    send_mqtt("Zumo10/ready","line");
+    struct sensors_ dig;
+    reflectance_set_threshold(15000, 15000, 18000, 18000, 15000, 15000);
     
+    reflectance_start();
+    IR_Start();
+    motor_start();
+    motor_forward(0,0);
+    TickType_t t0;
+    TickType_t t1;
+    TickType_t t2;
+    TickType_t t3;
+    BatteryLed_Write(1);
+    while (SW1_Read()==1);
+    
+    BatteryLed_Write(0);
+    vTaskDelay(1000);
+    
+    int count = 0;
+    int touching = 0;
+    
+    while(count < 3){
+        reflectance_digital(&dig);
+        
+        if (touching == 0 && dig.L3 == 1 && dig.L2 == 1 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 1 && dig.R3 == 1) {
+            count++;
+            touching = 1;
+            if (count == 1) {
+                motor_forward(0, 0);
+                IR_wait();
+                t0 = xTaskGetTickCount();
+                print_mqtt("Zumo10/start", "%d", t0);
+                
+            }
+        }
+        if ((dig.L1 == 0 && dig.R1 == 1) || (dig.R1 == 0 && dig.L1 == 1)){
+            t1 = xTaskGetTickCount();
+            print_mqtt("Zumo10/miss", "%d", t1);
+            while(dig.L1 == 1 && dig.R1 == 0){
+            tank_turns(1);
+            reflectance_digital(&dig);
+            }
+            while(dig.L1 == 0 && dig.R1 == 1){
+            tank_turns(-1);
+            reflectance_digital(&dig);
+            }
+            t2 = xTaskGetTickCount();
+            print_mqtt("Zumo10/line", "%d", t2);
+        
+        }
+        if (touching == 1 && dig.L3 == 0 && dig.L2 == 0 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 0 && dig.R3 == 0) {
+            touching = 0;
+        }
+
+        motor_forward(255, 0);
+        
+    }
+    motor_forward(0,0);
+    motor_stop();
+    t3 = xTaskGetTickCount();
+    print_mqtt("Zumo10/stop","%d", t3);
+    
+    int t = t3 - t0;
+    print_mqtt("Zumo10/time","%d", t);
+    
+
     
 }
 
 void project_3(void){
     
-    
-    printf("Robot starts!\n");
+ printf("Robot starts!\n");
     reflectance_start();
-    Ultra_Start();                         
+    Ultra_Start();  
+    IR_Start();
     motor_start();      
     motor_forward(0,0);
     struct sensors_ dig;
@@ -373,11 +438,13 @@ void project_3(void){
     
     int count = 0;
     int touching = 0;
+    int count_now;
+    int round = 0;
     
     while(true){
         reflectance_digital(&dig);
         int d = Ultra_GetDistance();
-        printf("distance is %d\n", d);
+       // printf("distance is %d\n", d);
         if (touching == 0 && dig.L3 == 1 && dig.L2 == 1 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 1 && dig.R3 == 1) {
             count++;
             touching = 1;
@@ -387,22 +454,49 @@ void project_3(void){
             }
         }
         
-        if(touching == 1 && d <= 12){
-            motor_forward(0,0);
-            reflectance_digital(&dig);
-            while(! (dig.L2 == 0 && dig.L1 == 1 && dig.R1 ==1 && dig.R2 == 0)){
-            motor_turn(5,160,0);
-            reflectance_digital(&dig);
+        if (touching == 1){
+            if( d <= 12){
+                round++;
+                motor_forward(0,0);
+                count_now = count;
+                printf("round is %d\n", round);
             }
-            
+            if (round == 1 && d <= 12){
+                reflectance_digital(&dig);
+                while(! (dig.L2 == 0 && dig.L1 == 1 && dig.R1 ==1 && dig.R2 == 0)){
+                    motor_turn(5,160,0);
+                    reflectance_digital(&dig);
+                }   
+            }
+            int b = count - count_now;
+            if (b == 2 && round == 1){
+                reflectance_digital(&dig);
+                while(! (dig.L2 == 0 && dig.L1 == 1 && dig.R1 ==1 && dig.R2 == 0)){
+                    motor_turn(160,5,0);
+                    reflectance_digital(&dig);
+                }   
+            }
+            if (round == 2 && d <= 12){
+                reflectance_digital(&dig);
+                while(! (dig.L2 == 0 && dig.L1 == 1 && dig.R1 ==1 && dig.R2 == 0)){
+                    motor_turn(160,5,0);
+                    reflectance_digital(&dig);
+                }  
+            }
+            if (b == 2 && round == 2){
+                reflectance_digital(&dig);
+                while(! (dig.L2 == 0 && dig.L1 == 1 && dig.R1 ==1 && dig.R2 == 0)){
+                    motor_turn(5,160,0);
+                    reflectance_digital(&dig);
+                }  
+            }
         }
         
         if (touching == 1 && dig.L3 == 0 && dig.L2 == 0 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 0 && dig.R3 == 0) {
             touching = 0;
         }
+        
         if ((dig.L1 == 0 && dig.R1 == 1) || (dig.R1 == 0 && dig.L1 == 1)){
-           
-            
             while(dig.L1 == 1 && dig.R1 == 0){
             tank_turns(1);
             reflectance_digital(&dig);
@@ -412,22 +506,14 @@ void project_3(void){
             reflectance_digital(&dig);
             }
         }
-        while(dig.L3 == 1 && dig.L2 == 1 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 1 && dig.R3 == 1){
-             if(count == 3){
-                motor_turn(160,5,0);
-                motor_forward(0,0);
-                reflectance_digital(&dig);
-            
-            }
-            
-        
-        
+        motor_forward(50, 10);
+        if ( dig.L3 == 0 && dig.L2 == 0 && dig.L1 == 0 && dig.R1 == 1 && dig.R2 == 0 && dig.R3 == 0){
+        motor_forward(0,0);
+   
         }
-        
-        motor_forward(50, 0);
+       motor_forward(0,0);
+       motor_stop(); 
     } 
-    motor_forward(0,0);
-    motor_stop();
 }
 
 

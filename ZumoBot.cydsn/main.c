@@ -42,13 +42,14 @@
 
 
 
-#if 0
+#if 1
 // test functions here
 void zmain(void)
 {
 
 }
 #endif
+
 
 #if 0
 //Project 1: Sumo_wrestling 
@@ -129,10 +130,7 @@ void zmain(void){
             break;
         }
     }
-}
-
-    
-
+ }
 #endif
 
 #if 0
@@ -170,7 +168,6 @@ void zmain(void){
                 IR_wait();
                 t0 = xTaskGetTickCount();
                 print_mqtt("Zumo10/start", "%d", t0);
-                
             }
         }
         if ((dig.R1 != 1) || (dig.L1 != 1)){
@@ -185,8 +182,8 @@ void zmain(void){
                 reflectance_digital(&dig);
             }
             if (dig.L1 == 1 && dig.R1 == 1){
-            t2 = xTaskGetTickCount();
-            print_mqtt("Zumo10/line", "%d", t2);
+                t2 = xTaskGetTickCount();
+                print_mqtt("Zumo10/line", "%d", t2);
             }
         }
         
@@ -194,15 +191,11 @@ void zmain(void){
             touching = 0;
         }
         motor_forward(255, 0);
-        
     }
-    
-    
     motor_forward(0,0);
     motor_stop();
     t3 = xTaskGetTickCount();
     print_mqtt("Zumo10/stop","%d", t3);
-    
     int t = t3 - t0;
     print_mqtt("Zumo10/time","%d", t);
     
