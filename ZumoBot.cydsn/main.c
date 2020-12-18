@@ -40,17 +40,6 @@
 */
 
 
-
-
-#if 1
-// test functions here
-void zmain(void)
-{
-
-}
-#endif
-
-
 #if 0
 //Project 1: Sumo_wrestling 
 void zmain(void){
@@ -317,7 +306,7 @@ void zmain(void)
             }
         } 
         
-        if (touching == 1 && dig.L3 == 0 && dig.L2 == 0 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 0 && dig.R3 == 0) {
+        if ((touching == 1 && dig.L3 == 0 && dig.L2 == 0 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 0 && dig.R3 == 0)||(touching == 1 && dig.L3 == 0 && dig.L2 == 1 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 0 && dig.R3 == 0)||(touching == 1 && dig.L3 == 0 && dig.L2 == 0 && dig.L1 == 1 && dig.R1 == 1 && dig.R2 == 1 && dig.R3 == 0)) {
             touching = 0;
         }
         
